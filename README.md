@@ -1,4 +1,4 @@
-# cp-template-nestjs--passport.com API
+# cp-template-nestjs API
 
 Prerequisites recommended:
 NodeJS: v12.18.3
