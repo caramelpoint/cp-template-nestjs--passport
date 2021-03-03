@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  api:
+    env_file:
+      - docker.env
+    environment:
+      - NODE_ENV=dev
+      - SERVER_PORT=$SERVER_PORT
+    build:
+      context: .
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    restart: always
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/postgres:/data/postgres
+    env_file:
+      - docker.env
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
