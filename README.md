@@ -1,4 +1,4 @@
-# FilterYa.com API
+# cp-template-nestjs--passport.com API
 
 Prerequisites recommended:
 NodeJS: v12.18.3
