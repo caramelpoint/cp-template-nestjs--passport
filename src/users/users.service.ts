@@ -24,4 +24,12 @@ export class UsersService {
     }
     throw new NotFoundException('User with this email does not exist');
   }
+
+  async getById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ id });
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException('User not found');
+  }
 }

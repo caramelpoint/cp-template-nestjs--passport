@@ -49,7 +49,7 @@ describe('AuthService', () => {
   });
 
   describe('getAuthenticatedUser', () => {
-    it('when user does not exist, should return bad request', async (done) => {
+    it('when user does not exist, should return unauthorized', async (done) => {
       jest.spyOn(usersService, 'getByEmail').mockImplementation(() => {
         throw new NotFoundException('User with this email does not exist');
       });
@@ -58,17 +58,17 @@ describe('AuthService', () => {
           .getAuthenticatedUser('email@test.com', 'password')
           .then(() =>
             done.fail(
-              'Auth service should throw a BadRequestException but did not',
+              'Auth service should throw a UnauthorizedException but did not',
             ),
           )
           .catch((error) => {
-            expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+            expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
             expect(error.message).toBe('Wrong credentials provided');
             done();
           }),
       );
     });
-    it('when the passwords dont match, should return bad request', async (done) => {
+    it('when the passwords dont match, should return unauthorized', async (done) => {
       const user = new User(
         1,
         'test@test.com',
@@ -82,11 +82,11 @@ describe('AuthService', () => {
           .getAuthenticatedUser('test@test.com', 'differentPassword')
           .then(() =>
             done.fail(
-              'Auth service should throw a BadRequestException but did not',
+              'Auth service should throw a UnauthorizedException but did not',
             ),
           )
           .catch((error) => {
-            expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+            expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
             expect(error.message).toBe('Wrong credentials provided');
             done();
           }),

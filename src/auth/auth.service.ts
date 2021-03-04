@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +12,7 @@ import { PostgresErrorCode } from '../database/postgresErrorCodes.enum';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
+import { TokenPayload } from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +32,7 @@ export class AuthService {
       this.deletePasswordFromUserObject(createdUser);
       return createdUser;
     } catch (error) {
-      this.handleError(error?.code);
+      this.handleRegisterError(error?.code);
     }
   }
 
@@ -59,7 +62,10 @@ export class AuthService {
       this.deletePasswordFromUserObject(user);
       return user;
     } catch (error) {
-      throw new BadRequestException('Wrong credentials provided');
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Wrong credentials provided');
+      }
+      throw error;
     }
   }
 
@@ -69,11 +75,11 @@ export class AuthService {
   ): Promise<void> {
     const isPasswordMatching = await bcrypt.compare(password, hashedPassword);
     if (!isPasswordMatching) {
-      throw new BadRequestException('Wrong credentials provided');
+      throw new UnauthorizedException('Wrong credentials provided');
     }
   }
 
-  private handleError(errorCode: string): void {
+  private handleRegisterError(errorCode: string): void {
     if (errorCode === PostgresErrorCode.UniqueViolation) {
       throw new BadRequestException('User with that email already exists');
     }
@@ -90,5 +96,9 @@ export class AuthService {
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
     )}`;
+  }
+
+  public getCookieForLogOut(): string {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }

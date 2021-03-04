@@ -1,3 +1,3 @@
 export const JwtServiceMock = {
-  sign: () => 'signedJwtToken',
+  sign: (): string => 'signedJwtToken',
 };

@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { PingService } from './ping.service';
 
 interface PingResponse {
-  response: string,
+  response: string;
 }
 
 @ApiTags('ping')
